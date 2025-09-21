@@ -15,6 +15,8 @@ The Scheduler Service provides a comprehensive solution for managing background 
 - **API Authentication**: Secure API access with API key authentication
 - **Scalable Architecture**: Designed for horizontal scaling and high availability
 
+**Note:** Scaling strategies for the microservice is discussed [here](Architecture_and_Scaling.md)
+
 ##  Current Architecture
 
 ```mermaid
