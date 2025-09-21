@@ -213,7 +213,7 @@ graph TB
 
 ### Production Environment Variables
 
-`ash
+`bash
 # Database Configuration
 DATABASE_URL=postgresql+asyncpg://username:password@rds-endpoint:5432/scheduler_db
 DATABASE_URL_SYNC=postgresql://username:password@rds-endpoint:5432/scheduler_db

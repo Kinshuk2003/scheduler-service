@@ -1,6 +1,6 @@
 # Scheduler Service
 
-A production-ready microservice for scheduling and executing background jobs with support for **real code execution**, cron expressions, datetime scheduling, and interval-based execution. Built with FastAPI, Celery, PostgreSQL, and Redis following SOLID principles and design patterns.
+A microservice for scheduling and executing background jobs with support for **real code execution**, cron expressions, datetime scheduling, and interval-based execution. Built with FastAPI, Celery, PostgreSQL, and Redis following SOLID principles and design patterns.
 
 ##  What This Service Does
 
@@ -125,20 +125,20 @@ Before setting up the Scheduler Service, ensure you have the following installed
 ### Quick Setup (Recommended)
 
 1. **Clone the repository**
-   `ash
+   ```bash
    git clone <repository-url>
    cd SchedulerService
-   `
+   ```
 
 2. **Start all services**
-   `ash
+   `bash
    docker-compose up -d
    `
 
 3. **Wait for services to be ready** (about 30 seconds)
 
 4. **Verify installation**
-   `ash
+   `bash
    # Check API health
    curl http://localhost:8000/health
    
@@ -154,42 +154,42 @@ Before setting up the Scheduler Service, ensure you have the following installed
 ### Manual Setup
 
 1. **Clone and navigate to repository**
-   `ash
+   `bash
    git clone <repository-url>
    cd SchedulerService
    `
 
 2. **Create virtual environment**
-   `ash
+   `bash
    python -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
    `
 
 3. **Install dependencies**
-   `ash
+   `bash
    pip install -r requirements.txt
    `
 
 4. **Set up environment variables**
-   `ash
+   `bash
    cp .env.example .env
    # Edit .env with your configuration
    `
 
 5. **Start PostgreSQL and Redis**
-   `ash
+   `bash
    # Using Docker
    docker run -d --name postgres -e POSTGRES_DB=scheduler_db -e POSTGRES_USER=scheduler -e POSTGRES_PASSWORD=scheduler -p 5432:5432 postgres:15-alpine
    docker run -d --name redis -p 6379:6379 redis:7-alpine
    `
 
 6. **Run database migrations**
-   `ash
+   `bash
    alembic upgrade head
    `
 
 7. **Start the services**
-   `ash
+   `bash
    # Terminal 1: Start API
    uvicorn src.app.main:app --host 0.0.0.0 --port 8000 --reload
    
@@ -258,7 +258,7 @@ Execute shell commands and scripts:
 ### Setting Up a Job
 
 1. **Create a Python code execution job**
-   `ash
+   `bash
    curl -X POST "http://localhost:8000/api/v1/jobs" \
      -H "X-API-Key: your-secret-api-key-here" \
      -H "Content-Type: application/json" \
@@ -279,7 +279,7 @@ Execute shell commands and scripts:
    `
 
 2. **Create a number crunching job**
-   `ash
+   `bash
    curl -X POST "http://localhost:8000/api/v1/jobs" \
      -H "X-API-Key: your-secret-api-key-here" \
      -H "Content-Type: application/json" \
@@ -301,25 +301,25 @@ Execute shell commands and scripts:
    `
 
 3. **List all jobs**
-   `ash
+   `bash
    curl -X GET "http://localhost:8000/api/v1/jobs" \
      -H "X-API-Key: your-secret-api-key-here"
    `
 
 4. **Get job details**
-   `ash
+   `bash
    curl -X GET "http://localhost:8000/api/v1/jobs/{job_id}" \
      -H "X-API-Key: your-secret-api-key-here"
    `
 
 5. **Run job immediately**
-   `ash
+   `bash
    curl -X POST "http://localhost:8000/api/v1/jobs/{job_id}/run" \
      -H "X-API-Key: your-secret-api-key-here"
    `
 
 6. **Check job execution history**
-   `ash
+   `bash
    curl -X GET "http://localhost:8000/api/v1/jobs/{job_id}/runs" \
      -H "X-API-Key: your-secret-api-key-here"
    `
@@ -329,7 +329,7 @@ Execute shell commands and scripts:
 Let's create a comprehensive number crunching job that performs multiple mathematical operations:
 
 1. **Create an advanced mathematical analysis job**
-   `ash
+   `bash
    curl -X POST "http://localhost:8000/api/v1/jobs" \
      -H "X-API-Key: your-secret-api-key-here" \
      -H "Content-Type: application/json" \
@@ -352,7 +352,7 @@ Let's create a comprehensive number crunching job that performs multiple mathema
 2. **Wait for execution** (15 minutes for the first run)
 
 3. **Check job runs to validate execution**
-   `ash
+   `bash
    curl -X GET "http://localhost:8000/api/v1/jobs/{job_id}/runs" \
      -H "X-API-Key: your-secret-api-key-here"
    `
@@ -440,7 +440,8 @@ Let's create a comprehensive number crunching job that performs multiple mathema
 | Variable | Description | Default |
 |----------|-------------|---------|
 | DATABASE_URL | PostgreSQL connection string | postgresql+asyncpg://scheduler:scheduler@localhost:5432/scheduler_db |
-| REDIS_URL | Redis connection string | edis://localhost:6379/0 |
+| REDIS_URL | Redis connection string | 
+edis://localhost:6379/0 |
 | API_KEY | API authentication key | your-secret-api-key-here |
 | LOG_LEVEL | Logging level | INFO |
 | ENVIRONMENT | Environment (development/production) | development |
@@ -462,7 +463,7 @@ Let's create a comprehensive number crunching job that performs multiple mathema
 ##  Testing
 
 ### Run Tests
-`ash
+`bash
 # Run all tests
 pytest
 
@@ -501,7 +502,7 @@ pytest tests/test_api.py
 ##  Deployment
 
 ### Docker Deployment
-`ash
+`bash
 # Build and start all services
 docker-compose up -d --build
 
