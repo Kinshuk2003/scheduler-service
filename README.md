@@ -17,7 +17,7 @@ The Scheduler Service provides a comprehensive solution for managing background 
 
 ##  Current Architecture
 
-`mermaid
+```mermaid
 graph TB
     subgraph "Client Layer"
         C[Client Applications]
@@ -69,7 +69,7 @@ graph TB
     W --> SH
     W --> NC
     F2 --> R
-`
+```
 
 ##  Technologies Used
 
@@ -131,20 +131,20 @@ Before setting up the Scheduler Service, ensure you have the following installed
    ```
 
 2. **Start all services**
-   `bash
+   ```bash
    docker-compose up -d
-   `
+   ```
 
 3. **Wait for services to be ready** (about 30 seconds)
 
 4. **Verify installation**
-   `bash
+   ```bash
    # Check API health
    curl http://localhost:8000/health
    
    # Check Flower monitoring
    curl http://localhost:5555
-   `
+   ```
 
 5. **Access the services**
    - **API Documentation**: http://localhost:8000/docs
@@ -154,42 +154,42 @@ Before setting up the Scheduler Service, ensure you have the following installed
 ### Manual Setup
 
 1. **Clone and navigate to repository**
-   `bash
+   ```bash
    git clone <repository-url>
    cd SchedulerService
-   `
+   ```
 
 2. **Create virtual environment**
-   `bash
+   ```bash
    python -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
-   `
+   ```
 
 3. **Install dependencies**
-   `bash
+   ```bash
    pip install -r requirements.txt
-   `
+   ```
 
 4. **Set up environment variables**
-   `bash
+   ```bash
    cp .env.example .env
    # Edit .env with your configuration
-   `
+   ```
 
 5. **Start PostgreSQL and Redis**
-   `bash
+   ```bash
    # Using Docker
    docker run -d --name postgres -e POSTGRES_DB=scheduler_db -e POSTGRES_USER=scheduler -e POSTGRES_PASSWORD=scheduler -p 5432:5432 postgres:15-alpine
    docker run -d --name redis -p 6379:6379 redis:7-alpine
-   `
+   ```
 
 6. **Run database migrations**
-   `bash
+   ```bash
    alembic upgrade head
-   `
+   ```
 
 7. **Start the services**
-   `bash
+   ```bash
    # Terminal 1: Start API
    uvicorn src.app.main:app --host 0.0.0.0 --port 8000 --reload
    
@@ -201,7 +201,7 @@ Before setting up the Scheduler Service, ensure you have the following installed
    
    # Terminal 4: Start Flower (optional)
    celery -A src.app.celery_app flower --port=5555
-   `
+   ```
 
 ##  Usage Guide
 
@@ -212,7 +212,7 @@ The scheduler supports various job types for different use cases:
 #### 1. Python Code Execution
 Execute actual Python code with full access to libraries:
 
-`json
+```json
 {
   "name": "Data Analysis Job",
   "schedule_expr": "0 2 * * *",
@@ -222,12 +222,12 @@ Execute actual Python code with full access to libraries:
     "code": "import pandas as pd\nimport numpy as np\n\n# Your analysis code here\ndata = pd.read_csv('data.csv')\nresult = data.describe()\nprint(result)"
   }
 }
-`
+```
 
 #### 2. Number Crunching Operations
 Built-in mathematical operations:
 
-`json
+```json
 {
   "name": "Fibonacci Calculator",
   "schedule_expr": "*/5 * * * *",
@@ -238,12 +238,12 @@ Built-in mathematical operations:
     "n": 100
   }
 }
-`
+```
 
 #### 3. Shell Script Execution
 Execute shell commands and scripts:
 
-`json
+```json
 {
   "name": "System Backup",
   "schedule_expr": "0 3 * * *",
@@ -253,12 +253,12 @@ Execute shell commands and scripts:
     "script": "#!/bin/bash\ntar -czf /backup/data-backup.tar.gz /data"
   }
 }
-`
+```
 
 ### Setting Up a Job
 
 1. **Create a Python code execution job**
-   `bash
+   ```bash
    curl -X POST "http://localhost:8000/api/v1/jobs" \
      -H "X-API-Key: your-secret-api-key-here" \
      -H "Content-Type: application/json" \
@@ -276,10 +276,10 @@ Execute shell commands and scripts:
        },
        "owner_id": "math_team"
      }'
-   `
+   ```
 
 2. **Create a number crunching job**
-   `bash
+   ```bash
    curl -X POST "http://localhost:8000/api/v1/jobs" \
      -H "X-API-Key: your-secret-api-key-here" \
      -H "Content-Type: application/json" \
@@ -298,38 +298,38 @@ Execute shell commands and scripts:
        },
        "owner_id": "math_team"
      }'
-   `
+   ```
 
 3. **List all jobs**
-   `bash
+   ```bash
    curl -X GET "http://localhost:8000/api/v1/jobs" \
      -H "X-API-Key: your-secret-api-key-here"
-   `
+   ```
 
 4. **Get job details**
-   `bash
+   ```bash
    curl -X GET "http://localhost:8000/api/v1/jobs/{job_id}" \
      -H "X-API-Key: your-secret-api-key-here"
-   `
+   ```
 
 5. **Run job immediately**
-   `bash
+   ```bash
    curl -X POST "http://localhost:8000/api/v1/jobs/{job_id}/run" \
      -H "X-API-Key: your-secret-api-key-here"
-   `
+   ```
 
 6. **Check job execution history**
-   `bash
+   ```bash
    curl -X GET "http://localhost:8000/api/v1/jobs/{job_id}/runs" \
      -H "X-API-Key: your-secret-api-key-here"
-   `
+   ```
 
 ### Example: Advanced Number Crunching Job
 
 Let's create a comprehensive number crunching job that performs multiple mathematical operations:
 
 1. **Create an advanced mathematical analysis job**
-   `bash
+   ```bash
    curl -X POST "http://localhost:8000/api/v1/jobs" \
      -H "X-API-Key: your-secret-api-key-here" \
      -H "Content-Type: application/json" \
@@ -347,18 +347,18 @@ Let's create a comprehensive number crunching job that performs multiple mathema
        },
        "owner_id": "research_team"
      }'
-   `
+   ```
 
 2. **Wait for execution** (15 minutes for the first run)
 
 3. **Check job runs to validate execution**
-   `bash
+   ```bash
    curl -X GET "http://localhost:8000/api/v1/jobs/{job_id}/runs" \
      -H "X-API-Key: your-secret-api-key-here"
-   `
+   ```
 
 4. **Expected response with real execution results**
-   `json
+   ```json
    {
      "runs": [
        {
@@ -375,7 +375,7 @@ Let's create a comprehensive number crunching job that performs multiple mathema
      "page": 1,
      "size": 10
    }
-   `
+   ```
 
 5. **Monitor in Flower**
    - Visit http://localhost:5555
@@ -463,7 +463,7 @@ edis://localhost:6379/0 |
 ##  Testing
 
 ### Run Tests
-`bash
+```bash
 # Run all tests
 pytest
 
@@ -472,7 +472,7 @@ pytest --cov=src --cov-report=html
 
 # Run specific test file
 pytest tests/test_api.py
-`
+```
 
 ### Test Categories
 - **Unit Tests**: Individual component testing
@@ -502,7 +502,7 @@ pytest tests/test_api.py
 ##  Deployment
 
 ### Docker Deployment
-`bash
+```bash
 # Build and start all services
 docker-compose up -d --build
 
@@ -511,7 +511,7 @@ docker-compose up -d --scale worker=3
 
 # View logs
 docker-compose logs -f api
-`
+```
 
 ### Production Considerations
 - Use environment-specific configuration
