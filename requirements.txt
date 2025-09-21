@@ -1,0 +1,43 @@
+# Core FastAPI and web framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# Pydantic for data validation and settings
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# Database
+sqlalchemy[asyncio]==2.0.23
+alembic==1.13.1
+asyncpg==0.29.0
+psycopg2-binary==2.9.9
+
+# Celery for background tasks and scheduling
+celery[redis]==5.3.4
+redis==4.6.0 # Changed for Celery 5.3.4 compatibility
+flower==2.0.1
+django-celery-beat==2.5.0 # For database scheduler
+
+# Scheduling utilities
+croniter==2.0.1
+pytz==2023.3
+
+# Scientific computing for number crunching
+numpy==1.24.3
+
+# Testing
+httpx==0.25.2
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+
+# Code quality
+black==23.11.0
+isort==5.12.0
+flake8==6.1.0
+mypy==1.7.1
+python-dotenv==1.0.0
+pre-commit==3.6.0
+
+# Logging and monitoring
+structlog==23.2.0

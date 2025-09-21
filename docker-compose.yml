@@ -1,0 +1,148 @@
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: scheduler_db
+    environment:
+      POSTGRES_DB: scheduler_db
+      POSTGRES_USER: scheduler
+      POSTGRES_PASSWORD: scheduler
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U scheduler -d scheduler_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - scheduler_network
+
+  # Redis Cache and Message Broker
+  redis:
+    image: redis:7-alpine
+    container_name: scheduler_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - scheduler_network
+
+  # FastAPI Application
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: scheduler_api
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://scheduler:scheduler@db:5432/scheduler_db
+      - DATABASE_URL_SYNC=postgresql://scheduler:scheduler@db:5432/scheduler_db
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - API_KEY=your-secret-api-key-here
+      - SECRET_KEY=your-secret-key-here
+      - LOG_LEVEL=INFO
+      - ENVIRONMENT=development
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./src:/app/src
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - scheduler_network
+
+  # Celery Worker
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: scheduler_worker
+    command: celery -A src.app.celery_app worker --loglevel=info --concurrency=4
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://scheduler:scheduler@db:5432/scheduler_db
+      - DATABASE_URL_SYNC=postgresql://scheduler:scheduler@db:5432/scheduler_db
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - LOG_LEVEL=INFO
+      - ENVIRONMENT=development
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./src:/app/src
+    networks:
+      - scheduler_network
+
+  # Celery Beat Scheduler
+  beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: scheduler_beat
+    command: celery -A src.app.celery_app beat --loglevel=info
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://scheduler:scheduler@db:5432/scheduler_db
+      - DATABASE_URL_SYNC=postgresql://scheduler:scheduler@db:5432/scheduler_db
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - LOG_LEVEL=INFO
+      - ENVIRONMENT=development
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./src:/app/src
+    networks:
+      - scheduler_network
+
+  # Flower (Celery Monitoring)
+  flower:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: scheduler_flower
+    command: celery -A src.app.celery_app flower --port=5555
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    ports:
+      - "5555:5555"
+    depends_on:
+      - redis
+      - worker
+    networks:
+      - scheduler_network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  scheduler_network:
+    driver: bridge
